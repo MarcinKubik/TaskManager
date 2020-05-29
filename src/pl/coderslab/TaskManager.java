@@ -43,7 +43,7 @@ public class TaskManager {
 
             input=scan.next();
             switch (input){
-                case ConsoleColors.GREEN+"add":
+                case "add":
                     addTask(data);
                     break;
                 case "remove":
@@ -135,9 +135,9 @@ public class TaskManager {
             StringBuilder str2=new StringBuilder();
             StringBuilder str3=new StringBuilder();
 
-            if(date.length()<10){
+            while(date.length()<10){
                 System.out.println("Wrong date format");
-                continue;
+                date=scan.next();
             }
 
             for (int i = 0; i <4 ; i++)

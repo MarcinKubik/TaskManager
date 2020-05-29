@@ -1,8 +1,8 @@
 package pl.coderslab;
 
 
+import org.apache.commons.lang3.math.NumberUtils;
 import pl.coderslab.ConsoleColors;
-
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -12,26 +12,16 @@ import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.Scanner;
 
+
 public class TaskManager {
 
     public static void main(String[] args) {
 
-        loadFromFile();
-        //showMethods();
+        String[][] data= new String[1][1];
+        data=loadFromFile();
+        selectOption(data);
        // selectOption();
 
-       /* String [][] aaa= {{"aaa", "bbb", "ccc"},{ "ddd", "eee", "fff"}, {"ggg", "hhh", "iii"}};
-        for (int i = 0; i < aaa.length; i++)
-        {
-            for (int j = 0; j <3 ; j++)
-            {
-                System.out.print(aaa[i][j]+" ");
-            }
-            System.out.println();
-        }
-        aaa[2]=Arrays.copyOf(aaa[2], aaa.length+1);
-
-        System.out.println(aaa[2][3]);*/
 
     }
 
@@ -45,7 +35,7 @@ public class TaskManager {
 
     }
 
-    public static String selectOption(){
+    public static void selectOption(String[][] data){
         Scanner scan=new Scanner(System.in);
         String input;
 
@@ -53,8 +43,8 @@ public class TaskManager {
 
             input=scan.next();
             switch (input){
-                case "add":
-                   // addTask();
+                case ConsoleColors.GREEN+"add":
+                    addTask(data);
                     break;
                 case "remove":
                     //removeTask();
@@ -62,7 +52,7 @@ public class TaskManager {
                 case "list":
                    // listTask();
                     break;
-                case "exi":
+                case "exit":
                    // exitTask();
                     break;
 
@@ -70,10 +60,9 @@ public class TaskManager {
                     System.out.println("Please select a correct option.");
             }
 
-        }while(!(input.equals("add") || input.equals("remove") || input.equals("lsit") || input.equals("exit") ));
+        }while(!(input.equals("add") || input.equals("remove") ||
+                input.equals("list") || input.equals("exit") ));
 
-
-        return input;
     }
 
     public static String[][] loadFromFile(){
@@ -105,8 +94,6 @@ public class TaskManager {
                     for ( int j = 0 ; j < strsplit.length; j++)
                     {
                         data[i][j]=strsplit[j];
-                        System.out.println(data[i][j]);
-                        System.out.println(i+" "+j);
                         data[i]= Arrays.copyOf(data[i], data[i].length+1);
                     }
 
@@ -120,22 +107,79 @@ public class TaskManager {
             data=Arrays.copyOf(data, data.length-1);
 
 
-
         }catch (FileNotFoundException ex){
             System.out.println("File not found");
         }
-        System.out.println(data.length);
 
-        for (int i = 0; i <data.length ; i++)
-        {
-            for (int j = 0; j <data[i].length; j++)
-            {
-                System.out.print(data[i][j]+" ");
+
+        return data;
+    }
+
+    public static String[][] addTask(String[][] data){
+
+        System.out.println("add");
+        System.out.println("Please add task description");
+        Scanner scan= new Scanner(System.in);
+        String description=ConsoleColors.GREEN+scan.nextLine();
+        boolean bool1=true;
+        boolean bool2=true;
+        boolean bool3=true;
+        String date;
+
+
+
+        do {
+            System.out.println("Please add task due date(yyyy-mm-dd)");
+            date=scan.next();
+            StringBuilder str1=new StringBuilder();
+            StringBuilder str2=new StringBuilder();
+            StringBuilder str3=new StringBuilder();
+
+            if(date.length()<10){
+                System.out.println("Wrong date format");
+                continue;
             }
-            System.out.println();
-        }
 
-        System.out.println("ccc");
+            for (int i = 0; i <4 ; i++)
+            {
+                str1.append(date.charAt(i));
+            }
+
+            str2.append(date.charAt(5));
+            str2.append(date.charAt(6));
+            str3.append(date.charAt(8));
+            str3.append(date.charAt(9));
+            System.out.println(ConsoleColors.RESET+str1.toString());
+            bool1= NumberUtils.isParsable(str1.toString());
+            bool2=NumberUtils.isParsable(str2.toString());
+            bool3=NumberUtils.isParsable(str3.toString());
+
+            if (bool1==false)
+            {
+                System.out.println("Wrong year format");
+            }
+
+            if (bool2==false)
+            {
+                System.out.println("Wrong month format");
+            }
+
+            if (bool3==false)
+            {
+                System.out.println("Wrong day format");
+            }
+
+
+        }while(!(bool1 && bool2 && bool3));
+
+        String taskImportance;
+        do {
+            System.out.println("Is your task important: true/false");
+            taskImportance=scan.next();
+        }while (!(taskImportance.equals("true") || taskImportance.equals("false")));
+
+
+        System.out.println(description+date+taskImportance);
         return data;
     }
 

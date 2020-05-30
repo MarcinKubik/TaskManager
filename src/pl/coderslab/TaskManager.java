@@ -1,11 +1,13 @@
 package pl.coderslab;
 
 
+import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import pl.coderslab.ConsoleColors;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -17,10 +19,9 @@ public class TaskManager {
 
     public static void main(String[] args) {
 
-        String[][] data= new String[1][1];
+        String[][] data;
         data=loadFromFile();
         selectOption(data);
-       // selectOption();
 
 
     }
@@ -36,6 +37,7 @@ public class TaskManager {
     }
 
     public static void selectOption(String[][] data){
+        showMethods();
         Scanner scan=new Scanner(System.in);
         String input;
 
@@ -44,31 +46,33 @@ public class TaskManager {
             input=scan.next();
             switch (input){
                 case "add":
-                    addTask(data);
+                    data=addTask(data);
                     break;
                 case "remove":
-                    //removeTask();
+                    data=removeTask(data);
                     break;
                 case "list":
-                   // listTask();
+                    listTask(data);
                     break;
                 case "exit":
-                   // exitTask();
+                    exitTask(data);
                     break;
 
                 default:
                     System.out.println("Please select a correct option.");
             }
 
-        }while(!(input.equals("add") || input.equals("remove") ||
-                input.equals("list") || input.equals("exit") ));
+            if(!input.equals("exit")) {
+                showMethods();
+            }
 
+        }while(!input.equals("exit"));
     }
 
     public static String[][] loadFromFile(){
 
-        Path path= Paths.get("example.csv");
-        File file=new File("example.csv");
+        Path path= Paths.get("tasks.csv");
+        File file=new File("tasks.csv");
         String[][] data= new String[1][1];
 
         try {
@@ -111,7 +115,6 @@ public class TaskManager {
             System.out.println("File not found");
         }
 
-
         return data;
     }
 
@@ -120,13 +123,11 @@ public class TaskManager {
         System.out.println("add");
         System.out.println("Please add task description");
         Scanner scan= new Scanner(System.in);
-        String description=ConsoleColors.GREEN+scan.nextLine();
+        String description=scan.nextLine();
         boolean bool1=true;
         boolean bool2=true;
         boolean bool3=true;
         String date;
-
-
 
         do {
             System.out.println("Please add task due date(yyyy-mm-dd)");
@@ -135,8 +136,8 @@ public class TaskManager {
             StringBuilder str2=new StringBuilder();
             StringBuilder str3=new StringBuilder();
 
-            while(date.length()<10){
-                System.out.println("Wrong date format");
+            while(date.length()!=10){
+                System.out.println("Wrong date format(yyyy-mm-dd)");
                 date=scan.next();
             }
 
@@ -149,7 +150,6 @@ public class TaskManager {
             str2.append(date.charAt(6));
             str3.append(date.charAt(8));
             str3.append(date.charAt(9));
-            System.out.println(ConsoleColors.RESET+str1.toString());
             bool1= NumberUtils.isParsable(str1.toString());
             bool2=NumberUtils.isParsable(str2.toString());
             bool3=NumberUtils.isParsable(str3.toString());
@@ -179,8 +179,88 @@ public class TaskManager {
         }while (!(taskImportance.equals("true") || taskImportance.equals("false")));
 
 
-        System.out.println(description+date+taskImportance);
+        data=Arrays.copyOf(data, data.length+1);
+        data[data.length-1]=new String[3];
+        data[data.length-1][0]=description;
+        data[data.length-1][1]=date;
+        data[data.length-1][2]=taskImportance;
+        System.out.println();
+
         return data;
     }
 
+public static String[][] removeTask(String[][] data){
+
+        System.out.println("remove");
+        System.out.println("Please select number to remove");
+        Scanner scan=new Scanner(System.in);
+        int numbertoremove;
+        String a;
+
+        while (true)
+        {
+            a=scan.next();
+            if(NumberUtils.isParsable(a)){
+                if(Integer.parseInt(a)<0 || Integer.parseInt(a)>data.length-1)
+                {
+                    System.out.println("Incorrect argument passed. Please give number of task from list");
+                }
+                else{
+                    break;
+                }
+            }
+            else {
+                System.out.println("Incorrect argument passed. Use number keys");
+            }
+
+
+        }
+
+        numbertoremove=Integer.parseInt(a);
+
+
+        data= ArrayUtils.remove(data, numbertoremove);
+        System.out.println("Value was succesfully deleted");
+        System.out.println();
+
+        return data;
+    }
+
+    public static void listTask(String[][] data){
+        for (int i = 0; i <data.length ; i++)
+        {
+            System.out.print(i+" : ");
+            for (int j = 0; j <3 ; j++)
+            {
+                System.out.print(data[i][j]+" ");
+            }
+            System.out.println();
+        }
+        System.out.println();
+    }
+
+    public static void exitTask(String[][] data){
+
+        try (PrintWriter printWriter= new PrintWriter("tasks.csv")){
+
+            for (int i = 0; i <data.length ; i++)
+            {
+                for (int j = 0; j <3 ; j++)
+                {
+                    if(j==2) {
+                        printWriter.print(data[i][j]);
+                    }
+                    else{
+                        printWriter.print(data[i][j] + ",");
+                    }
+                }
+                printWriter.println();
+            }
+
+        }catch (FileNotFoundException ex){
+            System.out.println("Data saving error");
+        }
+
+        System.out.println(ConsoleColors.RED+"Bye, bye.");
+    }
 }

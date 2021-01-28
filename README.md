@@ -1,7 +1,7 @@
 # TaskManager
 Application lets you manage yours tasks.
 
-#Options:
+## Options:
 
 *add
 This option lets you add some new task by giving task's description, date in format yyyy-mm-dd
